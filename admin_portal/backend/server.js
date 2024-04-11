@@ -94,6 +94,36 @@ app.get('/api/movies/:id', async (req, res) => {
     }
 });
 
+// PUT endpoint to update a movie by ID
+app.put('/api/movies/:id', async (req, res) => {
+    const movieId = req.params.id;
+    const { title, description, release_date, genre, poster_url } = req.body;
+
+    try {
+        // Check if the movie with the specified ID exists
+        const checkQuery = 'SELECT * FROM movies WHERE id = $1';
+        const checkResult = await client.query(checkQuery, [movieId]);
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Movie not found' });
+        }
+
+        // Update the movie details in the database
+        const updateQuery = `
+      UPDATE movies
+      SET title = $1, description = $2, release_date = $3, genre = $4, poster_url = $5, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $6
+    `;
+        const updateValues = [title, description, release_date, genre, poster_url, movieId];
+        await client.query(updateQuery, updateValues);
+
+        // Return success response
+        res.status(200).json({ success: true, message: 'Movie updated successfully' });
+    } catch (error) {
+        console.error('Error updating movie by ID:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
