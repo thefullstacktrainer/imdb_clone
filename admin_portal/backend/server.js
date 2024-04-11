@@ -124,6 +124,30 @@ app.put('/api/movies/:id', async (req, res) => {
     }
 });
 
+// DELETE endpoint to delete a movie by ID
+app.delete('/api/movies/:id', async (req, res) => {
+    const movieId = req.params.id;
+
+    try {
+        // Check if the movie with the specified ID exists
+        const checkQuery = 'SELECT * FROM movies WHERE id = $1';
+        const checkResult = await client.query(checkQuery, [movieId]);
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Movie not found' });
+        }
+
+        // Delete the movie from the database
+        const deleteQuery = 'DELETE FROM movies WHERE id = $1';
+        await client.query(deleteQuery, [movieId]);
+
+        // Return success response
+        res.status(200).json({ success: true, message: 'Movie deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting movie by ID:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
