@@ -54,6 +54,46 @@ app.post('/api/movies', async (req, res) => {
     }
 });
 
+// GET endpoint to fetch all movies
+app.get('/api/movies', async (req, res) => {
+    try {
+        // Query to fetch all movies from the movies table
+        const query = 'SELECT * FROM movies';
+        const result = await client.query(query);
+
+        // Return the list of movies as the response
+        const movies = result.rows;
+        res.status(200).json({ success: true, movies });
+    } catch (error) {
+        console.error('Error fetching movies:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
+
+// GET endpoint to fetch a movie by ID
+app.get('/api/movies/:id', async (req, res) => {
+    const movieId = req.params.id;
+
+    try {
+        // Query to fetch a movie by its ID
+        const query = 'SELECT * FROM movies WHERE id = $1';
+        const result = await client.query(query, [movieId]);
+
+        // Check if the movie with the specified ID exists
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Movie not found' });
+        }
+
+        // Return the movie details as the response
+        const movie = result.rows[0];
+        res.status(200).json({ success: true, movie });
+    } catch (error) {
+        console.error('Error fetching movie by ID:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
