@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  const apiUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:4001";
   return (
     <div className="App">
       <header className="App-header">
