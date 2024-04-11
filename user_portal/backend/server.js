@@ -37,7 +37,7 @@ app.get('/api/public/movies', async (req, res) => {
     try {
         // Query to fetch all movies with their average ratings
         const query = `
-            SELECT m.*, COALESCE(AVG(r.rating), 0) AS rating
+            SELECT m.*, COALESCE(CAST(AVG(r.rating) AS NUMERIC(10, 2)), 0) AS rating
             FROM movies m
             LEFT JOIN movie_ratings r ON m.id = r.movie_id
             GROUP BY m.id
