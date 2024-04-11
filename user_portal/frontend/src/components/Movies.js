@@ -6,11 +6,15 @@ import { faStar as fasStar } from '@fortawesome/free-solid-svg-icons';
 
 const Movies = () => {
     const [movies, setMovies] = useState([]);
+    const [showLoginDialog, setShowLoginDialog] = useState(false); // State to control the display of login dialog
     const apiUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:4001";
 
     useEffect(() => {
         fetchMovies();
     }, []);
+
+    // Define isLoggedIn to indicate whether the user is logged in or not
+    const isLoggedIn = true; // Replace this with your actual authentication logic
 
     const fetchMovies = async () => {
         try {
@@ -21,22 +25,9 @@ const Movies = () => {
         }
     };
 
-    const handleRating = async (movieId, rating) => {
-        try {
-            // Send rating to backend
-            console.log(rating);
-            // Update local state or fetch movies again
-            // For demonstration, we'll just update the local state
-            const updatedMovies = movies.map(movie => {
-                if (movie.id === movieId) {
-                    return { ...movie, userRating: rating };
-                }
-                return movie;
-            });
-            setMovies(updatedMovies);
-        } catch (error) {
-            console.error('Error rating movie:', error);
-        }
+    const handleRating = async () => {
+        // Display login dialog when user tries to rate without being logged in
+        setShowLoginDialog(true);
     };
 
     return (
@@ -61,8 +52,8 @@ const Movies = () => {
                         {[...Array(5)].map((_, index) => (
                             <button
                                 key={index}
-                                onClick={() => handleRating(movie.id, index + 1)}
-                                style={{ color: index < movie.userRating ? '#FFC120' : '#A0AEC0' }} // Yellow or gray color
+                                onClick={handleRating}
+                                disabled={!isLoggedIn} // Disable rating button if user is not logged in
                                 className="focus:outline-none inline-block"
                             >
                                 {index < movie.userRating ? <FontAwesomeIcon icon={fasStar} /> : (index + 0.5 === movie.userRating ? <FontAwesomeIcon icon={faStarHalfAlt} /> : <FontAwesomeIcon icon={farStar} />)}
@@ -71,6 +62,16 @@ const Movies = () => {
                     </div>
                 </div>
             ))}
+            {/* Login Dialog */}
+            {showLoginDialog && (
+                <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white p-8 rounded-lg">
+                        <h2 className="text-2xl font-semibold mb-4">Login Required</h2>
+                        <p className="text-gray-700 mb-4">You need to log in to rate this movie.</p>
+                        <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => setShowLoginDialog(false)}>Close</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
