@@ -1,10 +1,13 @@
-// src/components/Movies.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar as farStar, faStarHalfAlt } from '@fortawesome/free-regular-svg-icons';
+import { faStar as fasStar } from '@fortawesome/free-solid-svg-icons';
 
 const Movies = () => {
     const [movies, setMovies] = useState([]);
     const apiUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:4001";
+
     useEffect(() => {
         fetchMovies();
     }, []);
@@ -21,9 +24,16 @@ const Movies = () => {
     const handleRating = async (movieId, rating) => {
         try {
             // Send rating to backend
-            console.log(rating)
+            console.log(rating);
             // Update local state or fetch movies again
-            fetchMovies();
+            // For demonstration, we'll just update the local state
+            const updatedMovies = movies.map(movie => {
+                if (movie.id === movieId) {
+                    return { ...movie, userRating: rating };
+                }
+                return movie;
+            });
+            setMovies(updatedMovies);
         } catch (error) {
             console.error('Error rating movie:', error);
         }
@@ -31,17 +41,23 @@ const Movies = () => {
 
     return (
         <div>
-            <h2>Movies</h2>
+            <h2 className="text-2xl font-bold mb-4">Movies</h2>
             {movies.map((movie) => (
-                <div key={movie.id}>
-                    <h3>{movie.title}</h3>
-                    <p>{movie.description}</p>
+                <div key={movie.id} className="mb-8">
+                    <h3 className="text-xl font-semibold">{movie.title}</h3>
+                    <p className="text-gray-600 mb-4">{movie.description}</p>
                     <div>
-                        <button onClick={() => handleRating(movie.id, 1)}>Rate 1 star</button>
-                        <button onClick={() => handleRating(movie.id, 2)}>Rate 2 stars</button>
-                        <button onClick={() => handleRating(movie.id, 3)}>Rate 3 stars</button>
-                        <button onClick={() => handleRating(movie.id, 4)}>Rate 4 stars</button>
-                        <button onClick={() => handleRating(movie.id, 5)}>Rate 5 stars</button>
+                        {[...Array(5)].map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handleRating(movie.id, index + 1)}
+                                style={{ color: index < movie.userRating ? '#FFC120' : '#A0AEC0' }} // Yellow or gray color
+                                className="focus:outline-none"
+                            >
+                                {index < movie.userRating ? <FontAwesomeIcon icon={fasStar} /> : (index + 0.5 === movie.userRating ? <FontAwesomeIcon icon={faStarHalfAlt} /> : <FontAwesomeIcon icon={farStar} />)}
+                            </button>
+
+                        ))}
                     </div>
                 </div>
             ))}
