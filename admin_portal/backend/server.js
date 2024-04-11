@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { Client } = require('pg');
 require('dotenv').config(); // Load environment variables from .env file
-
+const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -25,6 +25,7 @@ const client = new Client({
 
 // Middleware for parsing JSON bodies
 app.use(bodyParser.json());
+app.use(cors());
 
 // Connect to PostgreSQL database
 client.connect()
