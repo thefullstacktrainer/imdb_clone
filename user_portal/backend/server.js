@@ -32,14 +32,19 @@ client.connect()
     .then(() => console.log('Connected to PostgreSQL'))
     .catch(error => console.error('Error connecting to PostgreSQL:', error));
 
-// GET endpoint to fetch all movies
+// GET endpoint to fetch all movies with average rating
 app.get('/api/public/movies', async (req, res) => {
     try {
-        // Query to fetch all movies from the movies table
-        const query = 'SELECT * FROM movies';
+        // Query to fetch all movies with their average ratings
+        const query = `
+            SELECT m.*, COALESCE(AVG(r.rating), 0) AS average_rating
+            FROM movies m
+            LEFT JOIN movie_ratings r ON m.id = r.movie_id
+            GROUP BY m.id
+        `;
         const result = await client.query(query);
 
-        // Return the list of movies as the response
+        // Return the list of movies with average ratings as the response
         const movies = result.rows;
         res.status(200).json({ success: true, movies });
     } catch (error) {
