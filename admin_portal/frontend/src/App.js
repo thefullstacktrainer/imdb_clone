@@ -6,6 +6,8 @@ import axios from 'axios';
 const App = () => {
   const [movies, setMovies] = useState([]);
   const [updateMovie, setUpdateMovie] = useState(null);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [movieToDelete, setMovieToDelete] = useState(null);
 
   useEffect(() => {
     fetchMovies();
@@ -26,7 +28,41 @@ const App = () => {
   };
 
   const handleCancel = () => {
-    setUpdateMovie(null); // Reset the update movie state
+    setUpdateMovie(null);
+    setShowConfirmationModal(false); // Ensure the modal is closed when canceling
+  };
+
+  const handleDeleteMovie = async (id) => {
+    setMovieToDelete(id);
+    setShowConfirmationModal(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:4000/api/movies/${movieToDelete}`);
+      await fetchMovies();
+    } catch (error) {
+      console.error('Error deleting movie:', error);
+    }
+    setShowConfirmationModal(false);
+    setMovieToDelete(null);
+  };
+
+  const ConfirmationModal = ({ isOpen, onClose, onConfirm, message }) => {
+    return (
+      <div className={`${isOpen ? '' : 'hidden'} fixed z-50 inset-0 overflow-y-auto`}>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="fixed inset-0 bg-black opacity-50"></div>
+          <div className="bg-white rounded-lg p-8 mx-auto z-50">
+            <div className="text-center mb-4">{message}</div>
+            <div className="flex justify-center">
+              <button onClick={onConfirm} className="bg-red-500 text-white py-2 px-4 rounded-md mr-2">Confirm</button>
+              <button onClick={onClose} className="bg-gray-400 text-white py-2 px-4 rounded-md">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -38,10 +74,19 @@ const App = () => {
           <div key={movie.id} className="bg-white shadow-md rounded-md p-4 mb-4">
             <h2 className="text-xl font-semibold">{movie.title}</h2>
             <p className="text-gray-700">{movie.description}</p>
-            <button className="bg-blue-500 text-white py-2 px-4 rounded-md mt-4" onClick={() => setUpdateMovie(movie)}>Update</button>
+            <div className="mt-4 flex justify-between">
+              <button className="bg-blue-500 text-white py-2 px-4 rounded-md" onClick={() => setUpdateMovie(movie)}>Update</button>
+              <button className="bg-red-500 text-white py-2 px-4 rounded-md" onClick={() => handleDeleteMovie(movie.id)}>Delete</button>
+            </div>
           </div>
         ))}
       </div>
+      <ConfirmationModal
+        isOpen={showConfirmationModal}
+        onClose={() => setShowConfirmationModal(false)}
+        onConfirm={confirmDelete}
+        message="Are you sure you want to delete this movie?"
+      />
     </div>
   );
 };
