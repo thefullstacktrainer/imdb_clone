@@ -41,9 +41,6 @@ const Movies = () => {
 
     return (
         <div>
-            <header className="bg-gray-800 text-white py-4">
-                <div className="text-4xl font-bold text-center">Movies</div>
-            </header>
             {movies.map((movie) => (
                 <div key={movie.id} className="mb-8">
                     <div className="flex justify-around items-center mb-2">
