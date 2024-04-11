@@ -41,10 +41,12 @@ const Movies = () => {
 
     return (
         <div>
-            <h2 className="text-2xl font-bold mb-4">Movies</h2>
+            <header className="bg-gray-800 text-white py-4">
+                <div className="text-4xl font-bold text-center">Movies</div>
+            </header>
             {movies.map((movie) => (
                 <div key={movie.id} className="mb-8">
-                    <h3 className="text-xl font-semibold">{movie.title}</h3>
+                    <h3>{movie.title}</h3>
                     <p className="text-gray-600 mb-4">{movie.description}</p>
                     <div>
                         {[...Array(5)].map((_, index) => (
@@ -52,11 +54,10 @@ const Movies = () => {
                                 key={index}
                                 onClick={() => handleRating(movie.id, index + 1)}
                                 style={{ color: index < movie.userRating ? '#FFC120' : '#A0AEC0' }} // Yellow or gray color
-                                className="focus:outline-none"
+                                className="focus:outline-none inline-block"
                             >
                                 {index < movie.userRating ? <FontAwesomeIcon icon={fasStar} /> : (index + 0.5 === movie.userRating ? <FontAwesomeIcon icon={faStarHalfAlt} /> : <FontAwesomeIcon icon={farStar} />)}
                             </button>
-
                         ))}
                     </div>
                 </div>
