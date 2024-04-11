@@ -48,6 +48,30 @@ app.get('/api/public/movies', async (req, res) => {
     }
 });
 
+// POST endpoint to add a rating to a movie
+app.post('/api/movies/:movieId/rating', async (req, res) => {
+    try {
+        const { movieId } = req.params;
+        const { rating, userId } = req.body; // Assuming userId is included in the request body
+
+        // Check if the rating is a valid number
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+            return res.status(400).json({ success: false, error: 'Invalid rating. Rating must be an integer between 1 and 5.' });
+        }
+
+        // Insert the rating into the movie_ratings table
+        const query = 'INSERT INTO movie_ratings (movie_id, user_id, rating) VALUES ($1, $2, $3) RETURNING *';
+        const result = await client.query(query, [movieId, userId, rating]);
+
+        const newRating = result.rows[0];
+        res.status(201).json({ success: true, rating: newRating });
+    } catch (error) {
+        console.error('Error adding rating:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
+
 
 // Start the server
 app.listen(PORT, () => {
