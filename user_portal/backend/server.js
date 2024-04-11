@@ -1,8 +1,13 @@
+// server.js
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Client } = require('pg');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 require('dotenv').config(); // Load environment variables from .env file
 const cors = require('cors');
+
 const app = express();
 const PORT = process.env.PORT || 4001;
 
@@ -32,6 +37,38 @@ client.connect()
     .then(() => console.log('Connected to PostgreSQL'))
     .catch(error => console.error('Error connecting to PostgreSQL:', error));
 
+// Helper function to hash passwords
+const hashPassword = async (password) => {
+    const saltRounds = 10;
+    return bcrypt.hash(password, saltRounds);
+};
+
+// Helper function to compare passwords
+const comparePasswords = async (plainPassword, hashedPassword) => {
+    return bcrypt.compare(plainPassword, hashedPassword);
+};
+
+// Helper function to generate JWT token
+const generateToken = (userId) => {
+    return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+};
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+    const token = req.headers['authorization'];
+    if (!token) {
+        return res.status(401).json({ success: false, error: 'Unauthorized: No token provided' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ success: false, error: 'Unauthorized: Invalid token' });
+        }
+        req.userId = decoded.userId;
+        next();
+    });
+};
+
 // GET endpoint to fetch all movies with average rating
 app.get('/api/public/movies', async (req, res) => {
     try {
@@ -53,11 +90,66 @@ app.get('/api/public/movies', async (req, res) => {
     }
 });
 
+// POST endpoint for user registration (signup)
+app.post('/api/signup', async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+
+        // Check if the username or email already exists
+        const userExistsQuery = 'SELECT * FROM users WHERE username = $1 OR email = $2';
+        const userExistsResult = await client.query(userExistsQuery, [username, email]);
+        if (userExistsResult.rows.length > 0) {
+            return res.status(400).json({ success: false, error: 'Username or email already exists' });
+        }
+
+        // Insert the new user into the users table
+        const createUserQuery = 'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *';
+        const hashedPassword = await hashPassword(password);
+        const createUserResult = await client.query(createUserQuery, [username, email, hashedPassword]);
+
+        const newUser = createUserResult.rows[0];
+        const token = generateToken(newUser.id);
+        res.status(201).json({ success: true, user: newUser, token });
+    } catch (error) {
+        console.error('Error signing up:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
+// POST endpoint for user authentication (login)
+app.post('/api/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        // Check if the username exists
+        const getUserQuery = 'SELECT * FROM users WHERE username = $1';
+        const getUserResult = await client.query(getUserQuery, [username]);
+        const user = getUserResult.rows[0];
+        if (!user) {
+            return res.status(401).json({ success: false, error: 'Invalid username or password' });
+        }
+
+        // Compare the provided password with the hashed password stored in the database
+        const passwordMatch = await comparePasswords(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ success: false, error: 'Invalid username or password' });
+        }
+
+        // Generate JWT token and return it along with user information
+        const token = generateToken(user.id);
+        res.status(200).json({ success: true, user, token });
+    } catch (error) {
+        console.error('Error logging in:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 // POST endpoint to add a rating to a movie
-app.post('/api/movies/:movieId/rating', async (req, res) => {
+app.post('/api/movies/:movieId/rating', verifyToken, async (req, res) => {
     try {
         const { movieId } = req.params;
-        const { rating, userId } = req.body; // Assuming userId is included in the request body
+        const { rating } = req.body;
+        const userId = req.userId;
 
         // Check if the rating is a valid number
         if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
@@ -75,8 +167,6 @@ app.post('/api/movies/:movieId/rating', async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
-
-
 
 // Start the server
 app.listen(PORT, () => {
