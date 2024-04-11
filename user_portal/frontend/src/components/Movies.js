@@ -3,11 +3,14 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as farStar, faStarHalfAlt } from '@fortawesome/free-regular-svg-icons';
 import { faStar as fasStar } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 
 const Movies = () => {
     const [movies, setMovies] = useState([]);
     const [showLoginDialog, setShowLoginDialog] = useState(false); // State to control the display of login dialog
     const apiUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:4001";
+    const navigate = useNavigate(); // Get the navigate function from react-router-dom
 
     useEffect(() => {
         fetchMovies();
@@ -28,6 +31,18 @@ const Movies = () => {
     const handleRating = async () => {
         // Display login dialog when user tries to rate without being logged in
         setShowLoginDialog(true);
+    };
+
+    const handleLogin = () => {
+        // Redirect the user to the login page
+        navigate('/login');
+        // Close the login dialog
+        setShowLoginDialog(false);
+    };
+
+    const handleCancel = () => {
+        // Close the login dialog
+        setShowLoginDialog(false);
     };
 
     return (
@@ -68,7 +83,8 @@ const Movies = () => {
                     <div className="bg-white p-8 rounded-lg">
                         <h2 className="text-2xl font-semibold mb-4">Login Required</h2>
                         <p className="text-gray-700 mb-4">You need to log in to rate this movie.</p>
-                        <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => setShowLoginDialog(false)}>Close</button>
+                        <button className="bg-blue-500 text-white px-4 py-2 rounded mr-2" onClick={handleLogin}>Login</button>
+                        <button className="text-blue-500" onClick={handleCancel}>Cancel</button> {/* Handle click event for cancel button */}
                     </div>
                 </div>
             )}
