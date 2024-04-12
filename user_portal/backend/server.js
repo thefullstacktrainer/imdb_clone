@@ -119,20 +119,20 @@ app.post('/api/signup', async (req, res) => {
 // POST endpoint for user authentication (login)
 app.post('/api/login', async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { usernameOrEmail, password } = req.body;
 
-        // Check if the username exists
-        const getUserQuery = 'SELECT * FROM users WHERE username = $1';
-        const getUserResult = await client.query(getUserQuery, [username]);
+        // Check if the username or email exists
+        const getUserQuery = 'SELECT * FROM users WHERE username = $1 OR email = $2';
+        const getUserResult = await client.query(getUserQuery, [usernameOrEmail, usernameOrEmail]);
         const user = getUserResult.rows[0];
         if (!user) {
-            return res.status(401).json({ success: false, error: 'Invalid username or password' });
+            return res.status(401).json({ success: false, error: 'Invalid username or email or password' });
         }
 
         // Compare the provided password with the hashed password stored in the database
         const passwordMatch = await comparePasswords(password, user.password);
         if (!passwordMatch) {
-            return res.status(401).json({ success: false, error: 'Invalid username or password' });
+            return res.status(401).json({ success: false, error: 'Invalid username or email or password' });
         }
 
         // Generate JWT token and return it along with user information
@@ -143,6 +143,7 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
+
 
 // POST endpoint to add a rating to a movie
 app.post('/api/movies/:movieId/rating', verifyToken, async (req, res) => {
