@@ -8,6 +8,11 @@ import Login from './components/Login';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track user's login status
 
+  const handleLogout = () => {
+    // Reset the login status to false
+    setIsLoggedIn(false);
+  };
+
   return (
     <Router>
       <div className="App">
@@ -20,8 +25,10 @@ function App() {
               {!isLoggedIn && (
                 <Link to="/signup" className="text-white">Sign Up</Link>
               )}
-              {!isLoggedIn && (
+              {!isLoggedIn ? (
                 <Link to="/login" className="text-white">Login</Link>
+              ) : (
+                <button onClick={handleLogout} className="text-white">Logout</button>
               )}
             </div>
           </div>
