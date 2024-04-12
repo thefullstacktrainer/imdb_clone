@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import './Login.css'; // Import the CSS file
 
-const Login = () => {
+const Login = ({ setIsLoggedIn }) => { // Accept setIsLoggedIn as a prop
     const [formData, setFormData] = useState({
         usernameOrEmail: '', // Change the state field name to usernameOrEmail
         password: ''
@@ -21,6 +21,8 @@ const Login = () => {
         try {
             const response = await axios.post(`${apiUrl}/api/login`, formData); // Use apiUrl in the API call
             console.log('Login successful', response.data);
+            // Update isLoggedIn state in App.js
+            setIsLoggedIn(true);
             // Handle successful login (e.g., redirect to dashboard)
             navigate('/'); // Redirect to the dashboard page
         } catch (error) {
