@@ -5,7 +5,7 @@ import './Login.css'; // Import the CSS file
 
 const Login = () => {
     const [formData, setFormData] = useState({
-        email: '',
+        usernameOrEmail: '', // Change the state field name to usernameOrEmail
         password: ''
     });
     const [errorDialogVisible, setErrorDialogVisible] = useState(false); // State to control the display of error dialog
@@ -38,8 +38,8 @@ const Login = () => {
             <h2 className="login-title">Login</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="email">Email</label>
-                    <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} />
+                    <label htmlFor="usernameOrEmail">Email or Username</label> {/* Change label text */}
+                    <input type="text" id="usernameOrEmail" name="usernameOrEmail" value={formData.usernameOrEmail} onChange={handleChange} /> {/* Change input type */}
                 </div>
                 <div className="form-group">
                     <label htmlFor="password">Password</label>
