@@ -31,8 +31,7 @@ const Movies = ({ isLoggedIn, userId }) => {
             try {
                 const response = await axios.post(
                     `${apiUrl}/api/movies/${movieId}/rating`,
-                    { rating: ratingValue, userId: userId },
-                    { withCredentials: true }
+                    { rating: ratingValue, userId: userId }
                 );
                 if (response.data.success) {
                     // If the rating is successfully added, update the movies list to reflect the new rating
