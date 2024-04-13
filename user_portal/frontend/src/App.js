@@ -1,39 +1,35 @@
+// App.js
 import './App.css';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Movies from './components/Movies';
 import Signup from './components/Signup';
 import Login from './components/Login';
-
+import MovieDetail from './components/MovieDetail';
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track user's login status
-  const [userId, setUserId] = useState(null); // State to store the user's ID
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState(null);
   const [username, setUsername] = useState('');
 
   useEffect(() => {
-    // Logic to fetch the userId from authentication state
-    // This is just an example, you should replace it with your actual logic
-    const userIdFromAuth = getUserIdFromAuth(); // Replace getUserIdFromAuth with your actual function
+    const userIdFromAuth = getUserIdFromAuth();
     const usernameFromAuth = sessionStorage.getItem('username');
     setUserId(userIdFromAuth);
     setUsername(usernameFromAuth);
-    setIsLoggedIn(!!userIdFromAuth); // Set isLoggedIn based on the presence of userId
+    setIsLoggedIn(!!userIdFromAuth);
   }, []);
 
-  // Function to retrieve userId from authentication state
   const getUserIdFromAuth = () => {
-    // Retrieve userId from session storage
     const userId = sessionStorage.getItem('userId');
     return userId;
   };
 
   const handleLogout = () => {
-    // Reset the login status to false
     setIsLoggedIn(false);
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('username');
-    window.location.reload(); //
+    window.location.reload();
   };
 
   return (
@@ -62,7 +58,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Movies isLoggedIn={isLoggedIn} userId={userId} />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} setUsername={setUsername} />} /> {/* Pass setIsLoggedIn as a prop */}
+          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} setUsername={setUsername} />} />
+          <Route path="/movies/:movieId" element={<MovieDetail />} /> {/* Define child route for MovieDetail */}
         </Routes>
       </div>
     </Router>

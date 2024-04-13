@@ -67,10 +67,14 @@ const Movies = ({ isLoggedIn }) => {
         setShowLoginDialog(false);
     };
 
+    const handleMovieDetail = (movieId) => {
+        navigate(`/movies/${movieId}`);
+    };
+
     return (
         <div>
             {movies.map((movie) => (
-                <div key={movie.id} className="mb-8">
+                <div key={movie.id} className="mb-8" onClick={() => handleMovieDetail(movie.id)} style={{ cursor: 'pointer' }}>
                     <div className="flex justify-around items-center mb-2">
                         <h3 className="text-xl font-semibold mr-4">{movie.title}</h3>
                         <div className="flex items-center">
@@ -89,7 +93,10 @@ const Movies = ({ isLoggedIn }) => {
                         {[...Array(5)].map((_, index) => (
                             <button
                                 key={index}
-                                onClick={() => handleRating(movie.id, index + 1)} // Pass movie id and rating value to handleRating function
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRating(movie.id, index + 1);
+                                }}
                                 className="focus:outline-none inline-block"
                             >
                                 {index < (userRatings[movie.id] || 0) ? <FontAwesomeIcon icon={fasStar} className="text-yellow-500" /> : (index + 0.5 === userRatings[movie.id] ? <FontAwesomeIcon icon={faStarHalfAlt} className="text-yellow-500" /> : <FontAwesomeIcon icon={farStar} className="text-yellow-500" />)}
