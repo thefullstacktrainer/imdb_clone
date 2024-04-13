@@ -7,13 +7,17 @@ import { useNavigate } from 'react-router-dom';
 
 const Movies = ({ isLoggedIn, userId }) => {
     const [movies, setMovies] = useState([]);
+    const [userRatings, setUserRatings] = useState({}); // State to store user ratings for each movie
     const [showLoginDialog, setShowLoginDialog] = useState(false);
     const apiUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:4001";
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchMovies();
-    }, []);
+        if (isLoggedIn) {
+            fetchUserRatings();
+        }
+    }, [isLoggedIn]); // Fetch user ratings when the login status changes
 
     const fetchMovies = async () => {
         try {
@@ -24,7 +28,17 @@ const Movies = ({ isLoggedIn, userId }) => {
         }
     };
 
-    const handleRating = async (movieId, ratingValue, userId) => {
+    const fetchUserRatings = async () => {
+        try {
+            const token = sessionStorage.getItem('token'); // Get the token from sessionStorage
+            const response = await axios.get(`${apiUrl}/api/user/${userId}/ratings`, { headers: { Authorization: `Bearer ${token}` } }); // Endpoint to fetch user ratings
+            setUserRatings(response.data.ratings); // Store user ratings in state
+        } catch (error) {
+            console.error('Error fetching user ratings:', error);
+        }
+    };
+
+    const handleRating = async (movieId, ratingValue) => {
         if (!isLoggedIn) {
             setShowLoginDialog(true);
         } else {
@@ -33,6 +47,7 @@ const Movies = ({ isLoggedIn, userId }) => {
                 const response = await axios.post(`${apiUrl}/api/movies/${movieId}/rating`, { rating: ratingValue }, { headers: { Authorization: `Bearer ${token}` } });
                 if (response.data.success) {
                     fetchMovies();
+                    fetchUserRatings();
                 } else {
                     console.error('Error adding rating:', response.data.error);
                 }
@@ -41,7 +56,6 @@ const Movies = ({ isLoggedIn, userId }) => {
             }
         }
     };
-
 
     const handleLogin = () => {
         navigate('/login');
@@ -74,10 +88,10 @@ const Movies = ({ isLoggedIn, userId }) => {
                         {[...Array(5)].map((_, index) => (
                             <button
                                 key={index}
-                                onClick={() => handleRating(movie.id, index + 1, userId)} // Pass movie id and rating value to handleRating function
+                                onClick={() => handleRating(movie.id, index + 1)} // Pass movie id and rating value to handleRating function
                                 className="focus:outline-none inline-block"
                             >
-                                {index < movie.userRating ? <FontAwesomeIcon icon={fasStar} /> : (index + 0.5 === movie.userRating ? <FontAwesomeIcon icon={faStarHalfAlt} /> : <FontAwesomeIcon icon={farStar} />)}
+                                {index < (userRatings[movie.id] || 0) ? <FontAwesomeIcon icon={fasStar} /> : (index + 0.5 === userRatings[movie.id] ? <FontAwesomeIcon icon={faStarHalfAlt} /> : <FontAwesomeIcon icon={farStar} />)}
                             </button>
                         ))}
                     </div>
