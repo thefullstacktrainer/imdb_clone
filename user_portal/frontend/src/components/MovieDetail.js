@@ -46,47 +46,49 @@ const MovieDetail = () => {
     };
 
     return (
-        <div>
-            {movie && (
-                <div className="mb-8">
-                    <div className="flex justify-around items-center mb-2">
-                        <h3 className="text-xl font-semibold mr-4">{movie.title}</h3>
-                        <div className="flex items-center">
-                            <div className="text-yellow-500 mr-2">
-                                {movie.rating && [...Array(Math.floor(movie.rating))].map((_, index) => (
-                                    <FontAwesomeIcon key={index} icon={fasStar} />
-                                ))}
-                                {movie.rating && movie.rating % 1 !== 0 && <FontAwesomeIcon icon={faStarHalfAlt} />}
-                                {!movie.rating && 'No rating'}
+        <div className="flex justify-center">
+            <div className="max-w-md px-4 py-8">
+                {movie && (
+                    <div className="mb-8">
+                        <div className="flex justify-around items-center mb-2">
+                            <h3 className="text-xl font-semibold mr-4">{movie.title}</h3>
+                            <div className="flex items-center">
+                                <div className="text-yellow-500 mr-2">
+                                    {movie.rating && [...Array(Math.floor(movie.rating))].map((_, index) => (
+                                        <FontAwesomeIcon key={index} icon={fasStar} />
+                                    ))}
+                                    {movie.rating && movie.rating % 1 !== 0 && <FontAwesomeIcon icon={faStarHalfAlt} />}
+                                    {!movie.rating && 'No rating'}
+                                </div>
+                                <span>({movie.rating || 'Not rated'})</span>
                             </div>
-                            <span>({movie.rating || 'Not rated'})</span>
+                        </div>
+                        <p className="text-gray-600 mb-4">{movie.description}</p>
+                        <p><strong>Release Date:</strong> {new Date(movie.release_date).toLocaleDateString()}</p>
+                        <p><strong>Genre:</strong> {movie.genre}</p>
+                        <p><strong>Created By:</strong> {movie.created_by || 'Unknown'}</p>
+                        <p><strong>Created At:</strong> {new Date(movie.created_at).toLocaleString()}</p>
+                        <p><strong>Updated At:</strong> {new Date(movie.updated_at).toLocaleString()}</p>
+                        <div className="flex space-x-2 mb-2">
+                            <span>Your Rating : </span>{[...Array(5)].map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleRating(index + 1)}
+                                    className="focus:outline-none inline-block"
+                                >
+                                    {index < userRating ? <FontAwesomeIcon icon={fasStar} className="text-yellow-500" /> : (index + 0.5 === userRating ? <FontAwesomeIcon icon={faStarHalfAlt} className="text-yellow-500" /> : <FontAwesomeIcon icon={farStar} className="text-yellow-500" />)}
+                                </button>
+                            ))}
+                        </div>
+                        <div>
+                            <video controls>
+                                <source src={movie.poster_url} type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
                         </div>
                     </div>
-                    <p className="text-gray-600 mb-4">{movie.description}</p>
-                    <p><strong>Release Date:</strong> {new Date(movie.release_date).toLocaleDateString()}</p>
-                    <p><strong>Genre:</strong> {movie.genre}</p>
-                    <p><strong>Created By:</strong> {movie.created_by || 'Unknown'}</p>
-                    <p><strong>Created At:</strong> {new Date(movie.created_at).toLocaleString()}</p>
-                    <p><strong>Updated At:</strong> {new Date(movie.updated_at).toLocaleString()}</p>
-                    <div className="flex space-x-2 mb-2">
-                        {[...Array(5)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleRating(index + 1)}
-                                className="focus:outline-none inline-block"
-                            >
-                                {index < userRating ? <FontAwesomeIcon icon={fasStar} className="text-yellow-500" /> : (index + 0.5 === userRating ? <FontAwesomeIcon icon={faStarHalfAlt} className="text-yellow-500" /> : <FontAwesomeIcon icon={farStar} className="text-yellow-500" />)}
-                            </button>
-                        ))}
-                    </div>
-                    <div>
-                        <video controls>
-                            <source src={movie.poster_url} type="video/mp4" />
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 };
