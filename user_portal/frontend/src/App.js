@@ -28,6 +28,7 @@ function App() {
     // Reset the login status to false
     setIsLoggedIn(false);
     sessionStorage.removeItem('userId');
+    sessionStorage.removeItem('token');
   };
 
   return (

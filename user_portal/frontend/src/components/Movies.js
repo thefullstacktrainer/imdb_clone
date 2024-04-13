@@ -91,7 +91,7 @@ const Movies = ({ isLoggedIn, userId }) => {
                                 onClick={() => handleRating(movie.id, index + 1)} // Pass movie id and rating value to handleRating function
                                 className="focus:outline-none inline-block"
                             >
-                                {index < (userRatings[movie.id] || 0) ? <FontAwesomeIcon icon={fasStar} /> : (index + 0.5 === userRatings[movie.id] ? <FontAwesomeIcon icon={faStarHalfAlt} /> : <FontAwesomeIcon icon={farStar} />)}
+                                {index < (userRatings[movie.id] || 0) ? <FontAwesomeIcon icon={fasStar} className="text-yellow-500" /> : (index + 0.5 === userRatings[movie.id] ? <FontAwesomeIcon icon={faStarHalfAlt} className="text-yellow-500" /> : <FontAwesomeIcon icon={farStar} className="text-yellow-500" />)}
                             </button>
                         ))}
                     </div>
