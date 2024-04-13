@@ -51,7 +51,7 @@ function App() {
           </div>
         </nav>
         <Routes>
-          <Route path="/" element={<Movies />} />
+          <Route path="/" element={<Movies isLoggedIn={isLoggedIn} userId={userId} />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} /> {/* Pass setIsLoggedIn as a prop */}
         </Routes>
