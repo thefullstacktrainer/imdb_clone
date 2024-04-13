@@ -8,14 +8,14 @@ const App = () => {
   const [updateMovie, setUpdateMovie] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [movieToDelete, setMovieToDelete] = useState(null);
-
+  const apiUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
   useEffect(() => {
     fetchMovies();
   }, []);
 
   const fetchMovies = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/movies');
+      const response = await axios.get(`{apiUrl}/api/movies`);
       setMovies(response.data.movies);
     } catch (error) {
       console.error('Error fetching movies:', error);
@@ -39,7 +39,7 @@ const App = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:4000/api/movies/${movieToDelete}`);
+      await axios.delete(`{apiUrl}/api/movies/${movieToDelete}`);
       await fetchMovies();
     } catch (error) {
       console.error('Error deleting movie:', error);
