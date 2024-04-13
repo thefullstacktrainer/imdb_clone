@@ -15,7 +15,7 @@ const App = () => {
 
   const fetchMovies = async () => {
     try {
-      const response = await axios.get(`{apiUrl}/api/movies`);
+      const response = await axios.get(`${apiUrl}/api/movies`);
       setMovies(response.data.movies);
     } catch (error) {
       console.error('Error fetching movies:', error);
@@ -39,7 +39,7 @@ const App = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`{apiUrl}/api/movies/${movieToDelete}`);
+      await axios.delete(`${apiUrl}/api/movies/${movieToDelete}`);
       await fetchMovies();
     } catch (error) {
       console.error('Error deleting movie:', error);
