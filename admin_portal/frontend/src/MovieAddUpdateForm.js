@@ -10,7 +10,7 @@ const MovieAddUpdateForm = ({ movie, onUpdate, onCancel }) => {
         genre: '',
         poster_url: '',
     });
-
+    const apiUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:4000";
     useEffect(() => {
         if (movie) {
             setFormData({
@@ -35,9 +35,9 @@ const MovieAddUpdateForm = ({ movie, onUpdate, onCancel }) => {
         e.preventDefault();
         try {
             if (movie) {
-                await axios.put(`http://localhost:4000/api/movies/${movie.id}`, formData);
+                await axios.put(`${apiUrl}/api/movies/${movie.id}`, formData);
             } else {
-                await axios.post('http://localhost:4000/api/movies', formData);
+                await axios.post(`${apiUrl}/api/movies`, formData);
             }
             onUpdate();
             setFormData({
