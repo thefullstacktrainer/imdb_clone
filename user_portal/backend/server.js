@@ -94,8 +94,11 @@ app.get('/api/public/movies', async (req, res) => {
 // GET endpoint to fetch a movie by its ID
 app.get('/api/public/movies/:movieId', async (req, res) => {
     try {
-        const movieId = req.params.movieId;
-
+        const movieId = req.params?.movieId;
+        if (!movieId) {
+            // If no movie is found with the provided ID, return a 404 response
+            return res.status(404).json({ success: false, error: 'Movie id missing' });
+        }
         // Query to fetch the movie details by ID
         const query = `
             SELECT m.*, COALESCE(CAST(AVG(r.rating) AS NUMERIC(10, 2)), 0) AS rating
