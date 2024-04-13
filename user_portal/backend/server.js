@@ -91,6 +91,38 @@ app.get('/api/public/movies', async (req, res) => {
     }
 });
 
+// GET endpoint to fetch a movie by its ID
+app.get('/api/public/movies/:movieId', async (req, res) => {
+    try {
+        const movieId = req.params.movieId;
+
+        // Query to fetch the movie details by ID
+        const query = `
+            SELECT m.*, COALESCE(CAST(AVG(r.rating) AS NUMERIC(10, 2)), 0) AS rating
+            FROM movies m
+            LEFT JOIN movie_ratings r ON m.id = r.movie_id
+            WHERE m.id = $1
+            GROUP BY m.id
+        `;
+
+        // Execute the query to fetch the movie details
+        const result = await client.query(query, [movieId]);
+
+        if (result.rows.length === 0) {
+            // If no movie is found with the provided ID, return a 404 response
+            return res.status(404).json({ success: false, error: 'Movie not found' });
+        }
+
+        // Return the movie details with its average rating
+        const movie = result.rows[0];
+        res.status(200).json({ success: true, movie });
+    } catch (error) {
+        console.error('Error fetching movie:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
+
 // POST endpoint for user registration (signup)
 app.post('/api/signup', async (req, res) => {
     try {
