@@ -4,13 +4,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as farStar, faStarHalfAlt } from '@fortawesome/free-regular-svg-icons';
 import { faStar as fasStar } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const MovieDetail = () => {
     const [movie, setMovie] = useState(null);
     const [userRating, setUserRating] = useState(null);
+    const [showLoginDialog, setShowLoginDialog] = useState(false); // State to control login popup
     const apiUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:4001";
     const { movieId } = useParams();
-
+    const token = sessionStorage.getItem('token');
     useEffect(() => {
         fetchMovieDetails();
     }, []); // Fetch movie details when the component mounts
@@ -20,7 +22,6 @@ const MovieDetail = () => {
             const response = await axios.get(`${apiUrl}/api/public/movies/${movieId}`);
             setMovie(response.data.movie);
             // Fetch user's rating for this movie if user is logged in
-            const token = sessionStorage.getItem('token');
             if (token) {
                 const userId = sessionStorage.getItem('userId');
                 const userRatingResponse = await axios.get(`${apiUrl}/api/user/${userId}/ratings/${movieId}`, { headers: { Authorization: `Bearer ${token}` } });
@@ -30,10 +31,18 @@ const MovieDetail = () => {
             console.error('Error fetching movie details:', error);
         }
     };
+    const navigate = useNavigate();
+    const handleLogin = () => {
+        navigate('/login');
+        setShowLoginDialog(false);
+    };
 
     const handleRating = async (ratingValue) => {
+        if (!token) { // Check if user is logged in
+            setShowLoginDialog(true); // Show login popup if user is not logged in
+            return;
+        }
         try {
-            const token = sessionStorage.getItem('token');
             const response = await axios.post(`${apiUrl}/api/movies/${movieId}/rating`, { rating: ratingValue }, { headers: { Authorization: `Bearer ${token}` } });
             if (response.data.success) {
                 fetchMovieDetails(); // Refresh movie details after rating is updated
@@ -70,7 +79,7 @@ const MovieDetail = () => {
                         <p><strong>Created At:</strong> {new Date(movie.created_at).toLocaleString()}</p>
                         <p><strong>Updated At:</strong> {new Date(movie.updated_at).toLocaleString()}</p>
                         <div className="flex space-x-2 mb-2">
-                            <span>Your Rating : </span>{[...Array(5)].map((_, index) => (
+                            <span>{token ? "Your Rating / " : ""} Rate Movie : </span>{[...Array(5)].map((_, index) => (
                                 <button
                                     key={index}
                                     onClick={() => handleRating(index + 1)}
@@ -89,6 +98,16 @@ const MovieDetail = () => {
                     </div>
                 )}
             </div>
+            {showLoginDialog && (
+                <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white p-8 rounded-lg">
+                        <h2 className="text-2xl font-semibold mb-4">Login Required</h2>
+                        <p className="text-gray-700 mb-4">You need to log in to rate this movie.</p>
+                        <button className="bg-blue-500 text-white px-4 py-2 rounded mr-2" onClick={handleLogin}>Login</button>
+                        <button className="text-blue-500" onClick={() => setShowLoginDialog(false)}>Cancel</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

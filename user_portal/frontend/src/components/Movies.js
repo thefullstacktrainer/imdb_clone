@@ -11,7 +11,7 @@ const Movies = ({ isLoggedIn }) => {
     const [showLoginDialog, setShowLoginDialog] = useState(false);
     const apiUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:4001";
     const navigate = useNavigate();
-
+    const token = sessionStorage.getItem('token');
     useEffect(() => {
         fetchMovies();
         if (isLoggedIn) {
@@ -30,7 +30,6 @@ const Movies = ({ isLoggedIn }) => {
 
     const fetchUserRatings = async () => {
         try {
-            const token = sessionStorage.getItem('token');
             const userId = sessionStorage.getItem('userId');
             const response = await axios.get(`${apiUrl}/api/user/${userId}/ratings`, { headers: { Authorization: `Bearer ${token}` } });
             setUserRatings(response.data.ratings);
@@ -44,7 +43,6 @@ const Movies = ({ isLoggedIn }) => {
             setShowLoginDialog(true);
         } else {
             try {
-                const token = sessionStorage.getItem('token');
                 const response = await axios.post(`${apiUrl}/api/movies/${movieId}/rating`, { rating: ratingValue }, { headers: { Authorization: `Bearer ${token}` } });
                 if (response.data.success) {
                     fetchMovies();
@@ -91,7 +89,7 @@ const Movies = ({ isLoggedIn }) => {
                         </div>
                         <p className="text-gray-600 mb-4">{movie.description}</p>
                         <div className="flex space-x-2 mb-2">
-                            {[...Array(5)].map((_, index) => (
+                            <span>{token ? "Your Rating / " : ""} Rate Movie : </span>{[...Array(5)].map((_, index) => (
                                 <button
                                     key={index}
                                     onClick={(e) => {
