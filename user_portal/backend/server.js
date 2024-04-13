@@ -125,6 +125,37 @@ app.get('/api/public/movies/:movieId', async (req, res) => {
     }
 });
 
+// GET endpoint to fetch a user's rating for a specific movie
+app.get('/api/user/:userId/ratings/:movieId', async (req, res) => {
+    try {
+        // Extract user ID and movie ID from request parameters
+        const userId = req.params.userId;
+        const movieId = req.params.movieId;
+
+        // Query the database to fetch the user's rating for the specified movie
+        const query = `
+            SELECT rating
+            FROM movie_ratings
+            WHERE user_id = $1 AND movie_id = $2
+        `;
+        const result = await client.query(query, [userId, movieId]);
+
+        // Check if a rating was found
+        if (result.rows.length === 0) {
+            // If no rating was found, return a 404 Not Found status
+            return res.status(404).json({ success: false, error: 'Rating not found' });
+        }
+
+        // Extract the rating from the query result
+        const rating = result.rows[0].rating;
+
+        // Return the rating in the response
+        res.status(200).json({ success: true, rating });
+    } catch (error) {
+        console.error('Error fetching user rating:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
 
 // POST endpoint for user registration (signup)
 app.post('/api/signup', async (req, res) => {
