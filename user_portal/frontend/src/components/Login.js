@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import './Login.css'; // Import the CSS file
 
-const Login = ({ setIsLoggedIn }) => { // Accept setIsLoggedIn as a prop
+const Login = ({ setIsLoggedIn, setUsername }) => { // Accept setIsLoggedIn as a prop
     const [formData, setFormData] = useState({
         usernameOrEmail: '', // Change the state field name to usernameOrEmail
         password: ''
@@ -25,6 +25,9 @@ const Login = ({ setIsLoggedIn }) => { // Accept setIsLoggedIn as a prop
             sessionStorage.setItem('userId', response.data?.user?.id);
             // Save the token in sessionStorage
             sessionStorage.setItem('token', response.data?.token);
+            // Save the token in username
+            sessionStorage.setItem('username', response.data?.user?.username);
+            setUsername(response.data?.user?.username);
             // Update isLoggedIn state in App.js
             setIsLoggedIn(true);
             // Handle successful login (e.g., redirect to dashboard)

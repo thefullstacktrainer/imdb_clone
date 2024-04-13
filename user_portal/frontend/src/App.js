@@ -8,12 +8,15 @@ import Login from './components/Login';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track user's login status
   const [userId, setUserId] = useState(null); // State to store the user's ID
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
     // Logic to fetch the userId from authentication state
     // This is just an example, you should replace it with your actual logic
     const userIdFromAuth = getUserIdFromAuth(); // Replace getUserIdFromAuth with your actual function
+    const usernameFromAuth = sessionStorage.getItem('username');
     setUserId(userIdFromAuth);
+    setUsername(usernameFromAuth);
     setIsLoggedIn(!!userIdFromAuth); // Set isLoggedIn based on the presence of userId
   }, []);
 
@@ -29,6 +32,7 @@ function App() {
     setIsLoggedIn(false);
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('token');
+    sessionStorage.removeItem('username');
     window.location.reload(); //
   };
 
@@ -40,7 +44,10 @@ function App() {
             <div className="text-white text-xl">
               <Link to="/">Movies</Link>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 items-center">
+              {isLoggedIn && (
+                <span className="text-white mr-4">Welcome, {username}</span>
+              )}
               {!isLoggedIn && (
                 <Link to="/signup" className="text-white">Sign Up</Link>
               )}
@@ -55,7 +62,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Movies isLoggedIn={isLoggedIn} userId={userId} />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} /> {/* Pass setIsLoggedIn as a prop */}
+          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} setUsername={setUsername} />} /> {/* Pass setIsLoggedIn as a prop */}
         </Routes>
       </div>
     </Router>
