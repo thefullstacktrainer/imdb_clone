@@ -23,6 +23,8 @@ const Login = ({ setIsLoggedIn }) => { // Accept setIsLoggedIn as a prop
             console.log('Login successful', response.data);
             // Store userId in session storage
             sessionStorage.setItem('userId', response.data?.user?.id);
+            // Save the token in sessionStorage
+            sessionStorage.setItem('token', response.data?.token);
             // Update isLoggedIn state in App.js
             setIsLoggedIn(true);
             // Handle successful login (e.g., redirect to dashboard)

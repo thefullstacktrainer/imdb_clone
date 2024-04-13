@@ -29,12 +29,9 @@ const Movies = ({ isLoggedIn, userId }) => {
             setShowLoginDialog(true);
         } else {
             try {
-                const response = await axios.post(
-                    `${apiUrl}/api/movies/${movieId}/rating`,
-                    { rating: ratingValue, userId: userId }
-                );
+                const token = sessionStorage.getItem('token'); // Get the token from sessionStorage
+                const response = await axios.post(`${apiUrl}/api/movies/${movieId}/rating`, { rating: ratingValue }, { headers: { Authorization: `Bearer ${token}` } });
                 if (response.data.success) {
-                    // If the rating is successfully added, update the movies list to reflect the new rating
                     fetchMovies();
                 } else {
                     console.error('Error adding rating:', response.data.error);
