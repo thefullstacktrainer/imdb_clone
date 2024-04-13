@@ -180,6 +180,28 @@ app.post('/api/movies/:movieId/rating', verifyToken, async (req, res) => {
     }
 });
 
+// GET endpoint to fetch user ratings for movies
+app.get('/api/user/:userId/ratings', verifyToken, async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        // Fetch user ratings from the database based on the userId
+        const query = 'SELECT movie_id, rating FROM movie_ratings WHERE user_id = $1';
+        const result = await client.query(query, [userId]);
+
+        // Convert the result into an object where movie_id is the key and rating is the value
+        const userRatings = {};
+        result.rows.forEach((row) => {
+            userRatings[row.movie_id] = row.rating;
+        });
+
+        res.status(200).json({ success: true, ratings: userRatings });
+    } catch (error) {
+        console.error('Error fetching user ratings:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 
 // Start the server
 app.listen(PORT, () => {
