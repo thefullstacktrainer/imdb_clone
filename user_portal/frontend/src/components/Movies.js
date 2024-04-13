@@ -5,7 +5,7 @@ import { faStar as farStar, faStarHalfAlt } from '@fortawesome/free-regular-svg-
 import { faStar as fasStar } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
-const Movies = ({ isLoggedIn, userId }) => {
+const Movies = ({ isLoggedIn }) => {
     const [movies, setMovies] = useState([]);
     const [userRatings, setUserRatings] = useState({}); // State to store user ratings for each movie
     const [showLoginDialog, setShowLoginDialog] = useState(false);
@@ -31,6 +31,7 @@ const Movies = ({ isLoggedIn, userId }) => {
     const fetchUserRatings = async () => {
         try {
             const token = sessionStorage.getItem('token'); // Get the token from sessionStorage
+            const userId = sessionStorage.getItem('userId'); // Get the userId from sessionStorage
             const response = await axios.get(`${apiUrl}/api/user/${userId}/ratings`, { headers: { Authorization: `Bearer ${token}` } }); // Endpoint to fetch user ratings
             setUserRatings(response.data.ratings); // Store user ratings in state
         } catch (error) {

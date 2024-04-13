@@ -29,6 +29,7 @@ function App() {
     setIsLoggedIn(false);
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('token');
+    window.location.reload(); //
   };
 
   return (
