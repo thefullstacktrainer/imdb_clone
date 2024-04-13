@@ -21,6 +21,8 @@ const Login = ({ setIsLoggedIn }) => { // Accept setIsLoggedIn as a prop
         try {
             const response = await axios.post(`${apiUrl}/api/login`, formData); // Use apiUrl in the API call
             console.log('Login successful', response.data);
+            // Store userId in session storage
+            sessionStorage.setItem('userId', response.data?.user?.id);
             // Update isLoggedIn state in App.js
             setIsLoggedIn(true);
             // Handle successful login (e.g., redirect to dashboard)
