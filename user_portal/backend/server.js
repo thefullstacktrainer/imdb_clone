@@ -145,8 +145,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-
-// POST endpoint to add a rating to a movie
+// POST endpoint to add or update a rating for a movie
 app.post('/api/movies/:movieId/rating', verifyToken, async (req, res) => {
     try {
         const { movieId } = req.params;
@@ -158,17 +157,29 @@ app.post('/api/movies/:movieId/rating', verifyToken, async (req, res) => {
             return res.status(400).json({ success: false, error: 'Invalid rating. Rating must be an integer between 1 and 5.' });
         }
 
-        // Insert the rating into the movie_ratings table
-        const query = 'INSERT INTO movie_ratings (movie_id, user_id, rating) VALUES ($1, $2, $3) RETURNING *';
-        const result = await client.query(query, [movieId, userId, rating]);
+        // Check if the user has already rated the movie
+        const existingRatingQuery = 'SELECT * FROM movie_ratings WHERE movie_id = $1 AND user_id = $2';
+        const existingRatingResult = await client.query(existingRatingQuery, [movieId, userId]);
 
-        const newRating = result.rows[0];
+        if (existingRatingResult.rows.length > 0) {
+            // User has already rated the movie, update the existing rating
+            const updateRatingQuery = 'UPDATE movie_ratings SET rating = $1 WHERE movie_id = $2 AND user_id = $3 RETURNING *';
+            const updateRatingResult = await client.query(updateRatingQuery, [rating, movieId, userId]);
+            const updatedRating = updateRatingResult.rows[0];
+            return res.status(200).json({ success: true, rating: updatedRating });
+        }
+
+        // Insert a new rating into the movie_ratings table
+        const insertRatingQuery = 'INSERT INTO movie_ratings (movie_id, user_id, rating) VALUES ($1, $2, $3) RETURNING *';
+        const insertRatingResult = await client.query(insertRatingQuery, [movieId, userId, rating]);
+        const newRating = insertRatingResult.rows[0];
         res.status(201).json({ success: true, rating: newRating });
     } catch (error) {
-        console.error('Error adding rating:', error);
+        console.error('Error adding or updating rating:', error);
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
+
 
 // Start the server
 app.listen(PORT, () => {
