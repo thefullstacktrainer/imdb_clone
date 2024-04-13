@@ -24,7 +24,8 @@ async function createMoviesTable() {
 
         // Define the SQL query to create the movies table
         const query = `
-        CREATE TABLE IF NOT EXISTS users(
+        -- Define users table with CASCADE DELETE constraint
+        CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
             username VARCHAR(100) UNIQUE NOT NULL,
             email VARCHAR(100) UNIQUE NOT NULL,
@@ -32,13 +33,30 @@ async function createMoviesTable() {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
-        CREATE TABLE IF NOT EXISTS movie_ratings(
+        -- Define movies table with CASCADE DELETE constraint
+        CREATE TABLE IF NOT EXISTS movies (
             id SERIAL PRIMARY KEY,
-            movie_id INTEGER REFERENCES movies(id),
-            user_id INTEGER REFERENCES users(id), --Optional, if you want to track who rated the movie
+            rating INTEGER,
+            title VARCHAR(255) NOT NULL,
+            description TEXT,
+            release_date DATE,
+            genre VARCHAR(100),
+            poster_url TEXT,
+            created_by INTEGER REFERENCES users(id) ON DELETE SET NULL, -- SET NULL when user is deleted
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Define movie_ratings table with CASCADE DELETE constraints for both user_id and movie_id
+        CREATE TABLE IF NOT EXISTS movie_ratings (
+            id SERIAL PRIMARY KEY,
+            movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE, -- CASCADE DELETE when movie is deleted
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, -- CASCADE DELETE when user is deleted
             rating INTEGER NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+
+
 
     `;
         // Execute the SQL query
