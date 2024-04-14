@@ -71,12 +71,12 @@ const Movies = ({ isLoggedIn }) => {
 
     return (
         <div className="flex justify-center">
-            <div className="max-w-md px-4 py-8">
+            <div className="max-w-md max-w-screen-md px-4 py-8">
                 {movies.map((movie) => (
                     <div key={movie.id} className="mb-8" onClick={() => handleMovieDetail(movie.id)} style={{ cursor: 'pointer' }}>
                         <div className="flex justify-around items-center mb-2">
-                            <h3 className="text-xl font-semibold mr-4">{movie.title}</h3>
-                            <div className="flex items-center">
+                            <h3 className="w-full md:w-auto text-xl font-semibold mr-4">{movie.title}</h3>
+                            <div className="w-full md:w-auto flex items-center">
                                 <div className="text-yellow-500 mr-2">
                                     {movie.rating && [...Array(Math.floor(movie.rating))].map((_, index) => (
                                         <FontAwesomeIcon key={index} icon={fasStar} />
@@ -88,7 +88,7 @@ const Movies = ({ isLoggedIn }) => {
                             </div>
                         </div>
                         <p className="text-gray-600 mb-4">{movie.description}</p>
-                        <div className="flex space-x-2 mb-2">
+                        <div className="flex justify-center space-x-2 mb-2">
                             <span>{token ? "Your Rating / " : ""} Rate Movie : </span>{[...Array(5)].map((_, index) => (
                                 <button
                                     key={index}
