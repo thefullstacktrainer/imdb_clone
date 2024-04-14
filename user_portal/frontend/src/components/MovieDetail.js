@@ -89,7 +89,7 @@ const MovieDetail = () => {
                                 </button>
                             ))}
                         </div>
-                        <div>
+                        <div className="flex justify-center">
                             <video controls>
                                 <source src={movie.poster_url} type="video/mp4" />
                                 Your browser does not support the video tag.
