@@ -35,10 +35,15 @@ async function createMoviesTable() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
-
+    const query2 = `
+    CREATE TABLE IF NOT EXISTS actors (
+        name VARCHAR(100) NOT NULL,
+        age INT
+    );
+    `;
         // Execute the SQL query
-        await client.query(query);
-        console.log('Movies table created successfully');
+        await client.query(query2);
+        console.log('Actors table created successfully');
     } catch (error) {
         console.error('Error creating movies table:', error);
     } finally {
