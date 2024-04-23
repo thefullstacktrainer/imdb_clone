@@ -31,6 +31,8 @@ app.use(cors());
 client.connect()
     .then(() => console.log('Connected to PostgreSQL'))
     .catch(error => console.error('Error connecting to PostgreSQL:', error));
+ 
+// API endpoint to store movie details
 app.post('/api/actors',async(req , res)=> {
     try{
         const {name , age} = req.body;
