@@ -70,6 +70,19 @@ app.post('/api/movies', async (req, res) => {
     }
 });
 
+app.get("/api/actors", async (req, res)=>{
+try{
+    const query ='SELECT * FROM actors';
+    const result = await client.query(query);
+    const actors = result.rows;
+    res.status(200).json({ success: true, actors });
+}
+     catch (error) {
+        console.error('Error fetching actors:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+    
+})
 // GET endpoint to fetch all movies
 app.get('/api/movies', async (req, res) => {
     try {
