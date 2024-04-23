@@ -31,7 +31,20 @@ app.use(cors());
 client.connect()
     .then(() => console.log('Connected to PostgreSQL'))
     .catch(error => console.error('Error connecting to PostgreSQL:', error));
+app.post('/api/actors',async(req , res)=> {
+    try{
+        const {name , age} = req.body;
+        const query = `INSERT INTO actors (name , age) VALUES($1 , $2) RETURNING *`;
+        const values =[name , age];
+        const result = await client.query(query, values);
 
+        const insertedActors = result.rows[0];
+        res.status(201).json({ success: true, movie: insertedActors });
+    } catch (error) {
+        console.error('Error storing actor details:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+})
 // API endpoint to store movie details
 app.post('/api/movies', async (req, res) => {
     try {
