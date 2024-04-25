@@ -302,6 +302,52 @@ app.post('/api/movies/:movieId/actors', async (req, res) => {
     }
 });
 
+// API endpoint to update associations between actors and a movie
+app.put('/api/movies/:movieId/actors', async (req, res) => {
+    const movieId = req.params.movieId;
+    const { addActorIds, removeActorIds } = req.body;
+
+    try {
+        // Check if the movie exists
+        const checkMovieQuery = 'SELECT * FROM movies WHERE id = $1';
+        const movieResult = await client.query(checkMovieQuery, [movieId]);
+        if (movieResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Movie not found' });
+        }
+
+        // Add new associations
+        if (addActorIds && addActorIds.length > 0) {
+            // Check if the actors exist
+            const checkActorsQuery = 'SELECT * FROM actors WHERE id = ANY($1)';
+            const actorsResult = await client.query(checkActorsQuery, [addActorIds]);
+            if (actorsResult.rows.length !== addActorIds.length) {
+                return res.status(404).json({ success: false, error: 'One or more actors not found' });
+            }
+
+            // Associate new actors with the movie
+            const existingAssociationsQuery = 'SELECT actor_id FROM movie_actors WHERE movie_id = $1 AND actor_id = ANY($2)';
+            const existingAssociationsResult = await client.query(existingAssociationsQuery, [movieId, addActorIds]);
+            const existingActorIds = existingAssociationsResult.rows.map(row => row.actor_id);
+
+            const newActorIds = addActorIds.filter(actorId => !existingActorIds.includes(actorId));
+            const associateQuery = 'INSERT INTO movie_actors (movie_id, actor_id) VALUES ($1, $2)';
+            const associatePromises = newActorIds.map(actorId => client.query(associateQuery, [movieId, actorId]));
+            await Promise.all(associatePromises);
+        }
+
+        // Remove existing associations
+        if (removeActorIds && removeActorIds.length > 0) {
+            const removeQuery = 'DELETE FROM movie_actors WHERE movie_id = $1 AND actor_id = ANY($2)';
+            await client.query(removeQuery, [movieId, removeActorIds]);
+        }
+
+        res.status(200).json({ success: true, message: 'Associations updated successfully' });
+    } catch (error) {
+        console.error('Error updating associations between actors and movie:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 
 // Start the server
 app.listen(PORT, () => {
