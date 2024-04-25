@@ -188,6 +188,29 @@ app.get('/api/actors', async (req, res) => {
     }
 });
 
+// GET endpoint to fetch an actor by ID
+app.get('/api/actors/:id', async (req, res) => {
+    const actorId = req.params.id;
+
+    try {
+        // Query to fetch an actor by its ID
+        const query = 'SELECT * FROM actors WHERE id = $1';
+        const result = await client.query(query, [actorId]);
+
+        // Check if the actor with the specified ID exists
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Actor not found' });
+        }
+
+        // Return the actor details as the response
+        const actor = result.rows[0];
+        res.status(200).json({ success: true, actor });
+    } catch (error) {
+        console.error('Error fetching actor by ID:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
