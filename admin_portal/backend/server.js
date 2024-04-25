@@ -172,6 +172,22 @@ app.post('/api/actors', async (req, res) => {
     }
 });
 
+// GET endpoint to fetch all actors
+app.get('/api/actors', async (req, res) => {
+    try {
+        // Query to fetch all actors from the actors table
+        const query = 'SELECT * FROM actors';
+        const result = await client.query(query);
+
+        // Return the list of actors as the response
+        const actors = result.rows;
+        res.status(200).json({ success: true, actors });
+    } catch (error) {
+        console.error('Error fetching actors:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
