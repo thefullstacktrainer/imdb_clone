@@ -241,6 +241,30 @@ app.put('/api/actors/:id', async (req, res) => {
     }
 });
 
+// DELETE endpoint to delete an actor by ID
+app.delete('/api/actors/:id', async (req, res) => {
+    const actorId = req.params.id;
+
+    try {
+        // Check if the actor with the specified ID exists
+        const checkQuery = 'SELECT * FROM actors WHERE id = $1';
+        const checkResult = await client.query(checkQuery, [actorId]);
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Actor not found' });
+        }
+
+        // Delete the actor from the database
+        const deleteQuery = 'DELETE FROM actors WHERE id = $1';
+        await client.query(deleteQuery, [actorId]);
+
+        // Return success response
+        res.status(200).json({ success: true, message: 'Actor deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting actor by ID:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
