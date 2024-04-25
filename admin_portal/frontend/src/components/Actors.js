@@ -1,3 +1,4 @@
+// Actors.js
 import React, { useState, useEffect } from 'react';
 import ActorAddUpdateForm from './ActorAddUpdateForm'; // You'll need to create this component
 import axios from 'axios';
@@ -71,8 +72,16 @@ const Actors = () => {
             <div className="mt-8">
                 {actors.map((actor) => (
                     <div key={actor.id} className="bg-white shadow-md rounded-md p-4 mb-4">
-                        <h2 className="text-xl font-semibold">{actor.name}</h2>
-                        <p className="text-gray-700">{actor.bio}</p>
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h2 className="text-xl font-semibold">{actor.name}</h2>
+                                <p className="text-gray-700">{actor.bio}</p>
+                            </div>
+                            <div>
+                                <p className="text-gray-700">Age: {actor.age}</p>
+                                <p className="text-gray-700">Gender: {actor.gender}</p>
+                            </div>
+                        </div>
                         <div className="mt-4 flex justify-between">
                             <button className="bg-blue-500 text-white py-2 px-4 rounded-md" onClick={() => setUpdateActor(actor)}>Update</button>
                             <button className="bg-red-500 text-white py-2 px-4 rounded-md" onClick={() => handleDeleteActor(actor.id)}>Delete</button>
