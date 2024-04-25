@@ -398,6 +398,46 @@ app.get('/api/actors-movies', async (req, res) => {
     }
 });
 
+// API endpoint to get association details of actors with a specific movie by its ID
+app.get('/api/movies/:movieId/actors', async (req, res) => {
+
+    const movieId = parseInt(req.params.movieId);
+    try {
+        // Query to fetch association details of actors with the specified movie
+        const query = `
+            SELECT m.id AS movie_id, m.title AS movie_title, m.description AS movie_description, 
+                   m.release_date AS movie_release_date, m.genre AS movie_genre,
+                   a.id AS actor_id, a.name AS actor_name, a.age AS actor_age, a.gender AS actor_gender
+            FROM movies m
+            INNER JOIN movie_actors ma ON m.id = ma.movie_id
+            INNER JOIN actors a ON a.id = ma.actor_id
+            WHERE m.id = $1
+        `;
+        const result = await client.query(query, [movieId]);
+
+        // Extract movie details and association details of actors
+        const movieDetails = {
+            id: result.rows[0].movie_id,
+            title: result.rows[0].movie_title,
+            description: result.rows[0].movie_description,
+            release_date: result.rows[0].movie_release_date,
+            genre: result.rows[0].movie_genre
+        };
+        const actors = result.rows.map(row => ({
+            id: row.actor_id,
+            name: row.actor_name,
+            age: row.actor_age,
+            gender: row.actor_gender
+        }));
+
+        // Return movie details and association details of actors with the specified movie
+        res.status(200).json({ success: true, movie: movieDetails, actors });
+    } catch (error) {
+        console.error('Error fetching association details of actors with movie by ID:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 
 // Start the server
 app.listen(PORT, () => {
