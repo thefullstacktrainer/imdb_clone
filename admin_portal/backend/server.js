@@ -211,6 +211,36 @@ app.get('/api/actors/:id', async (req, res) => {
     }
 });
 
+// PUT endpoint to update an actor by ID
+app.put('/api/actors/:id', async (req, res) => {
+    const actorId = req.params.id;
+    const { name, age, gender } = req.body;
+
+    try {
+        // Check if the actor with the specified ID exists
+        const checkQuery = 'SELECT * FROM actors WHERE id = $1';
+        const checkResult = await client.query(checkQuery, [actorId]);
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Actor not found' });
+        }
+
+        // Update the actor details in the database
+        const updateQuery = `
+            UPDATE actors
+            SET name = $1, age = $2, gender = $3, updated_at = CURRENT_TIMESTAMP
+            WHERE id = $4
+        `;
+        const updateValues = [name, age, gender, actorId];
+        await client.query(updateQuery, updateValues);
+
+        // Return success response
+        res.status(200).json({ success: true, message: 'Actor updated successfully' });
+    } catch (error) {
+        console.error('Error updating actor by ID:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
