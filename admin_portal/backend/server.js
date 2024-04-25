@@ -149,6 +149,29 @@ app.delete('/api/movies/:id', async (req, res) => {
     }
 });
 
+// POST endpoint to add a new actor
+app.post('/api/actors', async (req, res) => {
+    try {
+        const { name, age, gender } = req.body;
+
+        // Insert actor details into the actors table
+        const query = `
+            INSERT INTO actors (name, age, gender)
+            VALUES ($1, $2, $3)
+            RETURNING *
+        `;
+        const values = [name, age, gender];
+        const result = await client.query(query, values);
+
+        // Return the inserted actor details as the response
+        const insertedActor = result.rows[0];
+        res.status(201).json({ success: true, actor: insertedActor });
+    } catch (error) {
+        console.error('Error storing actor details:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
