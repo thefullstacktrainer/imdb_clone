@@ -286,8 +286,13 @@ app.post('/api/movies/:movieId/actors', async (req, res) => {
         }
 
         // Associate actors with the movie
+        const existingAssociationsQuery = 'SELECT * FROM movie_actors WHERE movie_id = $1 AND actor_id = ANY($2)';
+        const existingAssociationsResult = await client.query(existingAssociationsQuery, [movieId, actorIds]);
+        const existingAssociations = existingAssociationsResult.rows;
+
+        const newAssociations = actorIds.filter(actorId => !existingAssociations.some(association => association.actor_id === actorId));
         const associateQuery = 'INSERT INTO movie_actors (movie_id, actor_id) VALUES ($1, $2)';
-        const associatePromises = actorIds.map(actorId => client.query(associateQuery, [movieId, actorId]));
+        const associatePromises = newAssociations.map(actorId => client.query(associateQuery, [movieId, actorId]));
         await Promise.all(associatePromises);
 
         res.status(201).json({ success: true, message: 'Actors associated with the movie successfully' });
@@ -296,6 +301,7 @@ app.post('/api/movies/:movieId/actors', async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
+
 
 // Start the server
 app.listen(PORT, () => {
