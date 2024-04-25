@@ -10,6 +10,9 @@ const Sidenav = () => {
             <div className="mt-4">
                 <Link to="/movies" className="block px-4 py-2 text-lg text-white hover:bg-gray-700">Movies</Link>
             </div>
+            <div className="mt-4">
+                <Link to="/actors" className="block px-4 py-2 text-lg text-white hover:bg-gray-700">Actors</Link>
+            </div>
         </div>
     );
 };
