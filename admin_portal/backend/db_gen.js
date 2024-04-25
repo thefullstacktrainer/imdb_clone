@@ -45,7 +45,8 @@ async function createMoviesTable() {
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         `
-        const movie_actor = `CREATE TABLE IF NOT EXISTS actors (
+        const actor = `
+        CREATE TABLE IF NOT EXISTS actors (
             id SERIAL PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             age INT,
@@ -54,7 +55,14 @@ async function createMoviesTable() {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
-
+        `
+        const movie_actor = `CREATE TABLE IF NOT EXISTS movie_actors (
+            movie_id INT,
+            actor_id INT,
+            PRIMARY KEY (movie_id, actor_id),
+            FOREIGN KEY (movie_id) REFERENCES movies(id),
+            FOREIGN KEY (actor_id) REFERENCES actors(id)
+        );
         `
         // Execute the SQL query
         await client.query(movie_actor);
