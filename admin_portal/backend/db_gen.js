@@ -36,9 +36,18 @@ async function createMoviesTable() {
       )
     `;
 
+        const actor_query = `CREATE TABLE IF NOT EXISTS actors (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            age INT,
+            gender VARCHAR(10),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        `
         // Execute the SQL query
-        await client.query(query);
-        console.log('Movies table created successfully');
+        await client.query(actor_query);
+        console.log('Actor table created successfully');
     } catch (error) {
         console.error('Error creating movies table:', error);
     } finally {
