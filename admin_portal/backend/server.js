@@ -265,6 +265,38 @@ app.delete('/api/actors/:id', async (req, res) => {
     }
 });
 
+// API endpoint to associate multiple actors with a movie
+app.post('/api/movies/:movieId/actors', async (req, res) => {
+    const movieId = req.params.movieId;
+    const { actorIds } = req.body;
+
+    try {
+        // Check if the movie exists
+        const checkMovieQuery = 'SELECT * FROM movies WHERE id = $1';
+        const movieResult = await client.query(checkMovieQuery, [movieId]);
+        if (movieResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Movie not found' });
+        }
+
+        // Check if the actors exist
+        const checkActorsQuery = 'SELECT * FROM actors WHERE id = ANY($1)';
+        const actorsResult = await client.query(checkActorsQuery, [actorIds]);
+        if (actorsResult.rows.length !== actorIds.length) {
+            return res.status(404).json({ success: false, error: 'One or more actors not found' });
+        }
+
+        // Associate actors with the movie
+        const associateQuery = 'INSERT INTO movie_actors (movie_id, actor_id) VALUES ($1, $2)';
+        const associatePromises = actorIds.map(actorId => client.query(associateQuery, [movieId, actorId]));
+        await Promise.all(associatePromises);
+
+        res.status(201).json({ success: true, message: 'Actors associated with the movie successfully' });
+    } catch (error) {
+        console.error('Error associating actors with movie:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
