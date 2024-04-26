@@ -33,7 +33,7 @@ client.connect()
     .catch(error => console.error('Error connecting to PostgreSQL:', error));
  
 // API endpoint to store movie details
-app.post('/api/actors',async(req , res)=> {
+app.post('/api/actors',async (req , res)=> {
     try{
         const {name , age} = req.body;
         const query = `INSERT INTO actors (name , age) VALUES($1 , $2) RETURNING *`;
@@ -41,7 +41,7 @@ app.post('/api/actors',async(req , res)=> {
         const result = await client.query(query, values);
 
         const insertedActors = result.rows[0];
-        res.status(201).json({ success: true, movie: insertedActors });
+        res.status(201).json({ success: true, actor: insertedActors });
     } catch (error) {
         console.error('Error storing actor details:', error);
         res.status(500).json({ success: false, error: 'Internal Server Error' });
@@ -102,7 +102,7 @@ app.get("/api/actors/:id", async (req, res)=>{
 const actorId = req.params.id;
 try {
     const query = 'SELECT * FROM actors WHERE id = $1';
-        const result = await client.query(query, [movieId]);
+        const result = await client.query(query, [actorId]);
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, error: 'Actor not found' });
         }
@@ -139,6 +139,33 @@ app.get('/api/movies/:id', async (req, res) => {
     }
 });
 
+app.put("/api/actors/:id", async (req, res)=>{
+const actorID = req.params.id;
+const {name , age} = req.body;
+try{
+    const checkQuery = 'SELECT * FROM actors WHERE id = $1';
+        const checkResult = await client.query(checkQuery, [actorID]);
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'actor not found' });
+        }
+        const updateQuery = `
+        UPDATE actors
+        SET name = $1, age = $2
+        WHERE id = $3
+      `;
+          const updateValues = [name , age, actorID];
+          await client.query(updateQuery, updateValues);
+  
+          // Return success response
+          res.status(200).json({ success: true, message: 'ACtor updated successfully' });
+      } catch (error) {
+          console.error('Error updating actor by ID:', error);
+          res.status(500).json({ success: false, error: 'Internal Server Error' });
+      }
+  });
+   
+
+
 // PUT endpoint to update a movie by ID
 app.put('/api/movies/:id', async (req, res) => {
     const movieId = req.params.id;
@@ -169,6 +196,26 @@ app.put('/api/movies/:id', async (req, res) => {
     }
 });
 
+app.delete('/api/actors/:id',async(req , res)=>{
+    const actorID = req.params.id;
+    try{
+        const checkQuery ='SELECT * FROM actor WHERE id = $1';
+        const checkResult = await client.query(checkQuery, [actorID]);
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Movie not found' });
+            
+        }
+        const deleteQuery = 'DELETE FROM actors WHERE id = $1';
+        await client.query(deleteQuery, [actorID]);
+        res.status(200).json({ success: true, message: 'actor deleted successfully' });
+
+    }
+    catch(erro){
+        console.error('Error deleting actor by ID:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+
+    }
+})
 // DELETE endpoint to delete a movie by ID
 app.delete('/api/movies/:id', async (req, res) => {
     const movieId = req.params.id;
