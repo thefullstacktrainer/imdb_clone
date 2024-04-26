@@ -68,8 +68,8 @@ const Movies = () => {
 
     return (
         <div className="max-w-4xl mx-auto p-4">
-            <div class="max-w-lg mx-auto mb-6">
-                <h1 class="text-3xl font-semibold">Movies</h1>
+            <div className="max-w-lg mx-auto mb-6">
+                <h1 className="text-3xl font-semibold">Movies</h1>
             </div>
             <MovieAddUpdateForm movie={updateMovie} onUpdate={handleAddOrUpdateMovie} onCancel={handleCancel} />
             <div className="mt-8">
