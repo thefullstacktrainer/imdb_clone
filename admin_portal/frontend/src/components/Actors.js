@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import ActorAddUpdateForm from './ActorAddUpdateForm'; // You'll need to create this component
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Actors = () => {
     const [actors, setActors] = useState([]);
@@ -74,7 +75,9 @@ const Actors = () => {
                     <div key={actor.id} className="bg-white shadow-md rounded-md p-4 mb-4">
                         <div className="flex justify-between items-center">
                             <div>
-                                <h2 className="text-xl font-semibold">{actor.name}</h2>
+                                <h2 className="text-xl font-semibold">
+                                    <Link to={`/actors/${actor.id}`} className="text-blue-500 hover:underline">{actor.name}</Link>
+                                </h2>
                                 <p className="text-gray-700">{actor.bio}</p>
                             </div>
                             <div>
