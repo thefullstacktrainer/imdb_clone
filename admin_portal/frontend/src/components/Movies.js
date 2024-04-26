@@ -68,7 +68,9 @@ const Movies = () => {
 
     return (
         <div className="max-w-4xl mx-auto p-4">
-            <div><h1 className="text-3xl font-semibold mb-6">Movies</h1></div>
+            <div class="max-w-lg mx-auto mb-6">
+                <h1 class="text-3xl font-semibold">Movies</h1>
+            </div>
             <MovieAddUpdateForm movie={updateMovie} onUpdate={handleAddOrUpdateMovie} onCancel={handleCancel} />
             <div className="mt-8">
                 {movies.map((movie) => (
