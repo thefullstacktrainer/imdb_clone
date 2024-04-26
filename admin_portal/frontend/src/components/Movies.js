@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import MovieAddUpdateForm from './MovieAddUpdateForm';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Movies = () => {
     const [movies, setMovies] = useState([]);
@@ -72,7 +73,9 @@ const Movies = () => {
             <div className="mt-8">
                 {movies.map((movie) => (
                     <div key={movie.id} className="bg-white shadow-md rounded-md p-4 mb-4">
-                        <h2 className="text-xl font-semibold">{movie.title}</h2>
+                        <h2 className="text-xl font-semibold">
+                            <Link to={`/movies/${movie.id}`} className="text-blue-500 hover:underline">{movie.title}</Link>
+                        </h2>
                         <p className="text-gray-700">{movie.description}</p>
                         <div className="mt-4 flex justify-between">
                             <button className="bg-blue-500 text-white py-2 px-4 rounded-md" onClick={() => setUpdateMovie(movie)}>Update</button>
