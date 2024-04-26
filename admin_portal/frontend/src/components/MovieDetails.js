@@ -1,8 +1,8 @@
-// MovieDetails.js - Movie details component
+// MovieDetails.js
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import './MovieDetails.css'; // Import the CSS file for MovieDetails styling
+import './MovieDetails.css'; // Import the CSS file
 
 const MovieDetails = () => {
     const { id } = useParams();
@@ -23,18 +23,15 @@ const MovieDetails = () => {
     }, [id, apiUrl]);
 
     return (
-        <div className="movie-details-container">
+        <div className="container">
             {movie && (
-                <div>
-                    <h1 className="movie-title">{movie.title}</h1>
-                    <p className="movie-description">{movie.description}</p>
-                    <p className="movie-rating">Rating: {movie.rating}</p>
-                    <p className="movie-release-date">Release Date: {new Date(movie.release_date).toLocaleDateString()}</p>
-                    <p className="movie-genre">Genre: {movie.genre}</p>
-                    <img className="movie-poster" src={movie.poster_url} alt={movie.title} />
-                    <p className="movie-created-by">Created By: {movie.created_by}</p>
-                    <p className="movie-created-at">Created At: {new Date(movie.created_at).toLocaleString()}</p>
-                    <p className="movie-updated-at">Updated At: {new Date(movie.updated_at).toLocaleString()}</p>
+                <div className="movie-card">
+                    <h1>{movie.title}</h1>
+                    <p>{movie.description}</p>
+                    <p>Rating: {movie.rating}</p>
+                    <p>Genre: {movie.genre}</p>
+                    <p>Release Date: {new Date(movie.release_date).toDateString()}</p>
+                    <img src={movie.poster_url} alt={movie.title} />
                 </div>
             )}
         </div>
