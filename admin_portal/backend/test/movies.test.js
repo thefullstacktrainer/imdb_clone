@@ -7,13 +7,19 @@ const router = require('../src/movies');
 const app = express();
 app.use(bodyParser.json());
 app.use('/api/movies', router);
-
+var client;
+const getClient2 = () => {
+    client = getClient();
+    return client;
+}
 // Mock the database module
 jest.mock('../src/db', () => {
-    const { getClient, connect } = require('./mockDb');
-    return { getClient, connect };
-});
+    const { connect } = require('./mockDb');
 
+    return {
+        getClient: getClient2, connect
+    };
+});
 
 describe('POST /api/movies', () => {
     it('should create a new movie', async () => {
@@ -37,5 +43,36 @@ describe('POST /api/movies', () => {
         expect(response.body.movie.description).toBe(newMovie.description);
         expect(response.body.movie.genre).toBe(newMovie.genre);
         expect(response.body.movie.poster_url).toBe(newMovie.poster_url);
+    });
+});
+
+describe('GET /api/movies', () => {
+    // Get the mocked client object
+
+
+    it('should fetch all movies', async () => {
+        const mockMovies = [
+            { id: 1, title: 'Movie 1', description: 'Description 1', release_date: '2023-01-01', genre: 'Action', poster_url: 'https://example.com/movie1.jpg' },
+            { id: 2, title: 'Movie 2', description: 'Description 2', release_date: '2024-01-01', genre: 'Comedy', poster_url: 'https://example.com/movie2.jpg' }
+        ];
+
+        // Mock the query method of the client object to return mock movies
+        jest.spyOn(client, 'query').mockResolvedValueOnce({ rows: mockMovies });
+        const response = await request(app).get('/api/movies');
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.movies).toEqual(mockMovies);
+    });
+
+    it('should handle errors when fetching movies', async () => {
+        // Mock the query method of the client object to throw an error
+        jest.spyOn(client, 'query').mockRejectedValueOnce(new Error('Database error'));
+
+        const response = await request(app).get('/api/movies');
+
+        expect(response.statusCode).toBe(500);
+        expect(response.body.success).toBe(false);
+        expect(response.body.error).toBe('Internal Server Error');
     });
 });
