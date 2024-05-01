@@ -205,7 +205,61 @@ router.get('/', async (req, res) => {
     }
 });
 
-
+/**
+ * @swagger
+ * /api/movies/{id}:
+ *   get:
+ *     summary: Get a movie by ID
+ *     description: Fetches details of a movie by its unique identifier.
+ *     tags: [Movies]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the movie to fetch
+ *         schema:
+ *           type: integer
+ *           format: int64
+ *     responses:
+ *       '200':
+ *         description: Movie details fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful
+ *                 movie:
+ *                   $ref: '#/components/schemas/Movie'
+ *       '404':
+ *         description: Movie not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating movie not found
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating internal server error
+ */
 // GET endpoint to fetch a movie by ID
 router.get('/:id', async (req, res) => {
     const movieId = req.params.id;
