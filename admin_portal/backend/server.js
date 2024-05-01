@@ -6,7 +6,7 @@ const actorsRouter = require('./src/actors');
 const cors = require('cors');
 const swaggerUI = require("swagger-ui-express");
 const yaml = require('yamljs');
-const swaggerDocument = yaml.load('./swagger.yaml');
+const swaggerDocument = yaml.load('./swagger_doc/swagger.yaml');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
