@@ -75,6 +75,7 @@ app.get('/api/actors-movies', async (req, res) => {
  * /health:
  *  get:
  *    description: Health Check API
+ *    tags: [Health]
  *    responses:
  *      '200':
  *        description: A successful response
