@@ -33,6 +33,15 @@ router.post('/', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/movies:
+ *  get:
+ *    description: API to Get All Movies
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
 // GET endpoint to fetch all movies
 router.get('/', async (req, res) => {
     try {
