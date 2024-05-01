@@ -113,6 +113,87 @@ describe('GET /api/movies/:id', () => {
     });
 });
 
+describe('PUT /api/movies/:id', () => {
+    it('should update a movie by ID', async () => {
+        const movieId = 1;
+        const updatedMovie = {
+            title: 'Updated Title',
+            description: 'Updated Description',
+            release_date: '2024-05-01',
+            genre: 'Updated Genre',
+            poster_url: 'https://example.com/updated-poster.jpg'
+        };
+
+        // Mock the query to check if the movie exists
+        jest.spyOn(client, 'query').mockResolvedValueOnce({ rows: [{ id: movieId }] });
+
+        // Mock the query to update the movie details
+        jest.spyOn(client, 'query').mockResolvedValueOnce();
+
+        // Make the PUT request to update the movie
+        const response = await request(app)
+            .put(`/api/movies/${movieId}`)
+            .send(updatedMovie);
+
+        // Assertions
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe('Movie updated successfully');
+    });
+
+    it('should handle error when movie not found', async () => {
+        const movieId = 999; // A non-existent movie ID
+        const updatedMovie = {
+            title: 'Updated Title',
+            description: 'Updated Description',
+            release_date: '2024-05-01',
+            genre: 'Updated Genre',
+            poster_url: 'https://example.com/updated-poster.jpg'
+        };
+
+        // Mock the query to check if the movie exists (not necessary since the movie doesn't exist)
+        jest.spyOn(client, 'query').mockResolvedValueOnce({ rows: [] });
+
+        // Make the PUT request to update the movie
+        const response = await request(app)
+            .put(`/api/movies/${movieId}`)
+            .send(updatedMovie);
+
+        // Assertions
+        expect(response.statusCode).toBe(404);
+        expect(response.body.success).toBe(false);
+        expect(response.body.error).toBe('Movie not found');
+    });
+
+    it('should handle errors when updating movie by ID', async () => {
+        const movieId = 1;
+        const updatedMovie = {
+            title: 'Updated Title',
+            description: 'Updated Description',
+            release_date: '2024-05-01',
+            genre: 'Updated Genre',
+            poster_url: 'https://example.com/updated-poster.jpg'
+        };
+
+        // Mock the query to check if the movie exists
+        jest.spyOn(client, 'query').mockResolvedValueOnce({ rows: [{ id: movieId }] });
+
+        // Mock the query to update the movie details
+        jest.spyOn(client, 'query').mockRejectedValueOnce(new Error('Database error'));
+
+        // Make the PUT request to update the movie
+        const response = await request(app)
+            .put(`/api/movies/${movieId}`)
+            .send(updatedMovie);
+
+        // Assertions
+        expect(response.statusCode).toBe(500);
+        expect(response.body.success).toBe(false);
+        expect(response.body.error).toBe('Internal Server Error');
+    });
+});
+
+
 describe('PUT /api/movies/:movieId/actors', () => {
 
     it('should handle error when movie not found', async () => {
