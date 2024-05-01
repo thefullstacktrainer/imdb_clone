@@ -375,6 +375,62 @@ router.put('/:id', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/movies/{id}:
+ *   delete:
+ *     summary: Delete a movie by ID
+ *     description: Deletes a movie specified by its unique identifier.
+ *     tags: [Movies]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the movie to delete
+ *         schema:
+ *           type: integer
+ *           format: int64
+ *     responses:
+ *       '200':
+ *         description: Movie deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful
+ *                 message:
+ *                   type: string
+ *                   description: Success message indicating movie deleted successfully
+ *       '404':
+ *         description: Movie not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating movie not found
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating internal server error
+ */
 // DELETE endpoint to delete a movie by ID
 router.delete('/:id', async (req, res) => {
     const movieId = req.params.id;
