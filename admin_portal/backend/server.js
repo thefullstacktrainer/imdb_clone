@@ -4,8 +4,9 @@ const db = require('./src/db');
 const moviesRouter = require('./src/movies');
 const actorsRouter = require('./src/actors');
 const cors = require('cors');
-const swaggerJSDoc = require("swagger-jsdoc");
 const swaggerUI = require("swagger-ui-express");
+const yaml = require('yamljs');
+const swaggerDocument = yaml.load('./swagger.yaml');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -70,35 +71,11 @@ app.get('/api/actors-movies', async (req, res) => {
     }
 });
 
-/**
- * @swagger
- * /health:
- *  get:
- *    description: Health Check API
- *    tags: [Health]
- *    responses:
- *      '200':
- *        description: A successful response
- */
 app.get('/health', (req, res) => { res.send("Healthy") });
-
 
 app.get('/', (req, res) => { res.send("Welcome to IMDB Admin Portal") });
 
-// Swagger Configuration
-const swaggerOptions = {
-    swaggerDefinition: {
-        openapi: "3.0.0",
-        info: {
-            title: "Users API",
-            version: "1.0.0",
-        },
-    },
-    apis: ["./src/*.js", "server.js"],
-};
-
-const swaggerDocs = swaggerJSDoc(swaggerOptions);
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 // Start the server
 app.listen(PORT, () => {
