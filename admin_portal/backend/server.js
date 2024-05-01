@@ -78,6 +78,8 @@ app.get('/', (req, res) => { res.send("Welcome to IMDB Admin Portal") });
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 // Start the server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+module.exports = server;
