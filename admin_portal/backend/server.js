@@ -70,7 +70,17 @@ app.get('/api/actors-movies', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /health:
+ *  get:
+ *    description: Health Check API
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
 app.get('/health', (req, res) => { res.send("Healthy") });
+
 
 app.get('/', (req, res) => { res.send("Welcome to IMDB Admin Portal") });
 
