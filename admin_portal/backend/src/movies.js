@@ -35,12 +35,98 @@ router.post('/', async (req, res) => {
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     Movie:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The unique identifier of the movie
+ *         rating:
+ *           type: number
+ *           nullable: true
+ *           description: The rating of the movie
+ *         title:
+ *           type: string
+ *           description: The title of the movie
+ *         description:
+ *           type: string
+ *           description: A brief description of the movie
+ *         release_date:
+ *           type: string
+ *           format: date-time
+ *           description: The release date of the movie
+ *         genre:
+ *           type: string
+ *           description: The genre(s) of the movie
+ *         poster_url:
+ *           type: string
+ *           format: uri
+ *           description: The URL to the poster image of the movie
+ *         created_by:
+ *           type: string
+ *           nullable: true
+ *           description: The creator of the movie entry
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *           description: The creation timestamp of the movie entry
+ *         updated_at:
+ *           type: string
+ *           format: date-time
+ *           description: The last update timestamp of the movie entry
+ */
+
+/**
+ * @swagger
  * /api/movies:
- *  get:
- *    description: API to Get All Movies
- *    responses:
- *      '200':
- *        description: A successful response
+ *   get:
+ *     summary: Get a list of movies
+ *     description: Returns a list of movies
+ *     responses:
+ *       200:
+ *         description: A list of movies
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful
+ *                 movies:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Movie'
+ *     tags:
+ *       - Movies
+ *     security:
+ *       - apiKeyAuth: []
+ *     examples:
+ *       application/json:
+ *         success: true
+ *         movies:
+ *           - id: 1
+ *             rating: null
+ *             title: "The Shawshank Redemption"
+ *             description: "Over the course of several years, two convicts form a friendship, seeking consolation and, eventually, redemption through basic compassion."
+ *             release_date: "1994-01-09T18:30:00.000Z"
+ *             genre: "Drama"
+ *             poster_url: "https://m.media-amazon.com/images/M/MV5BMTM0NjUxMDk5MF5BMl5BanBnXkFtZTcwNDMxNDY3Mw@@._V1_FMjpg_UX1800_.jpg"
+ *             created_by: null
+ *             created_at: "2024-04-13T02:08:26.278Z"
+ *             updated_at: "2024-04-26T14:27:11.382Z"
+ *           - id: 2
+ *             rating: null
+ *             title: "Life Is Beautiful"
+ *             description: "When an open-minded Jewish waiter and his son become victims of the Holocaust, he uses a perfect mixture of will, humor and imagination to protect his son from the dangers around their camp."
+ *             release_date: "1997-07-29T18:30:00.000Z"
+ *             genre: "Romance, Drama, Comedy"
+ *             poster_url: "https://m.media-amazon.com/images/M/MV5BMjE3MTM0Mjg2NV5BMl5BanBnXkFtZTYwOTI1NDM3._V1_FMjpg_UX480_.jpg"
+ *             created_by: null
+ *             created_at: "2024-04-13T02:09:57.349Z"
+ *             updated_at: "2024-04-26T14:28:39.169Z"
  */
 // GET endpoint to fetch all movies
 router.get('/', async (req, res) => {
