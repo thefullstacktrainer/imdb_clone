@@ -76,3 +76,42 @@ describe('GET /api/movies', () => {
         expect(response.body.error).toBe('Internal Server Error');
     });
 });
+
+describe('GET /api/movies/:id', () => {
+    it('should fetch a movie by ID', async () => {
+        const movieId = 1;
+        const mockMovie = { id: movieId, title: 'Movie 1', description: 'Description 1', release_date: '2023-01-01', genre: 'Action', poster_url: 'https://example.com/movie1.jpg' };
+
+        jest.spyOn(client, 'query').mockResolvedValueOnce({ rows: [mockMovie] });
+
+        const response = await request(app).get(`/api/movies/${movieId}`);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.movie).toEqual(mockMovie);
+    });
+
+    it('should handle error when movie not found', async () => {
+        const movieId = 999;
+
+        jest.spyOn(client, 'query').mockResolvedValueOnce({ rows: [] });
+
+        const response = await request(app).get(`/api/movies/${movieId}`);
+
+        expect(response.statusCode).toBe(404);
+        expect(response.body.success).toBe(false);
+        expect(response.body.error).toBe('Movie not found');
+    });
+
+    it('should handle errors when fetching movie by ID', async () => {
+        const movieId = 1;
+
+        jest.spyOn(client, 'query').mockRejectedValueOnce(new Error('Database error'));
+
+        const response = await request(app).get(`/api/movies/${movieId}`);
+
+        expect(response.statusCode).toBe(500);
+        expect(response.body.success).toBe(false);
+        expect(response.body.error).toBe('Internal Server Error');
+    });
+});
