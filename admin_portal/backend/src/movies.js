@@ -283,6 +283,68 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/movies/{id}:
+ *   put:
+ *     summary: Update a movie by ID
+ *     description: Updates details of a movie specified by its unique identifier.
+ *     tags: [Movies]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the movie to update
+ *         schema:
+ *           type: integer
+ *           format: int64
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Movie'
+ *     responses:
+ *       '200':
+ *         description: Movie updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful
+ *                 message:
+ *                   type: string
+ *                   description: Success message indicating movie updated successfully
+ *       '404':
+ *         description: Movie not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating movie not found
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating internal server error
+ */
 // PUT endpoint to update a movie by ID
 router.put('/:id', async (req, res) => {
     const movieId = req.params.id;
