@@ -1,14 +1,28 @@
 const request = require('supertest');
-const app = require('../server'); // Import the app
+const express = require('express');
+const bodyParser = require('body-parser');
+const { getClient } = require('./mockDb'); // Import the mocked database functions
+const router = require('../src/movies');
+
+const app = express();
+app.use(bodyParser.json());
+app.use('/api/movies', router);
+
+// Mock the database module
+jest.mock('../src/db', () => {
+    const { getClient, connect } = require('./mockDb');
+    return { getClient, connect };
+});
+
 
 describe('POST /api/movies', () => {
     it('should create a new movie', async () => {
         const newMovie = {
             title: 'Test Movie',
-            description: 'This is a test movie',
+            description: 'Test Description',
             release_date: '2024-05-01T00:00:00.000Z',
             genre: 'Test Genre',
-            poster_url: 'https://example.com/test-movie-poster.jpg',
+            poster_url: 'https://example.com/test.jpg',
         };
 
         const response = await request(app)
