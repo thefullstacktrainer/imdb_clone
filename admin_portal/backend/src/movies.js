@@ -10,29 +10,7 @@ router.use(cors());
 // Connect to PostgreSQL database
 const client = getClient(); // Get the PostgreSQL client
 
-// API endpoint to store movie details
-router.post('/', async (req, res) => {
-    try {
-        const { title, description, release_date, genre, poster_url } = req.body;
-
-        // Insert movie details into the movies table
-        const query = `
-      INSERT INTO movies (title, description, release_date, genre, poster_url)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *
-    `;
-        const values = [title, description, release_date, genre, poster_url];
-        const result = await client.query(query, values);
-
-        // Return the inserted movie details as the response
-        const insertedMovie = result.rows[0];
-        res.status(201).json({ success: true, movie: insertedMovie });
-    } catch (error) {
-        console.error('Error storing movie details:', error);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
-    }
-});
-
+// Define the Movie schema
 /**
  * @swagger
  * components:
@@ -77,6 +55,89 @@ router.post('/', async (req, res) => {
  *           format: date-time
  *           description: The last update timestamp of the movie entry
  */
+
+// API endpoint to store movie details
+/**
+ * @swagger
+ * /api/movies:
+ *   post:
+ *     summary: Add a new movie
+ *     description: Add a new movie with title, description, release date, genre, and poster URL.
+ *     tags: [Movies]
+ *     security:
+ *       - apiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: The title of the movie.
+ *               description:
+ *                 type: string
+ *                 description: A brief description of the movie.
+ *               release_date:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The release date of the movie.
+ *               genre:
+ *                 type: string
+ *                 description: The genre(s) of the movie.
+ *               poster_url:
+ *                 type: string
+ *                 format: uri
+ *                 description: The URL to the poster image of the movie.
+ *     responses:
+ *       201:
+ *         description: Movie created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful.
+ *                 movie:
+ *                   $ref: '#/components/schemas/Movie'
+ *       500:
+ *         description: Internal Server Error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the request was successful.
+ *                 error:
+ *                   type: string
+ *                   description: Error message.
+ */
+router.post('/', async (req, res) => {
+    try {
+        const { title, description, release_date, genre, poster_url } = req.body;
+
+        // Insert movie details into the movies table
+        const query = `
+      INSERT INTO movies (title, description, release_date, genre, poster_url)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `;
+        const values = [title, description, release_date, genre, poster_url];
+        const result = await client.query(query, values);
+
+        // Return the inserted movie details as the response
+        const insertedMovie = result.rows[0];
+        res.status(201).json({ success: true, movie: insertedMovie });
+    } catch (error) {
+        console.error('Error storing movie details:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
 
 /**
  * @swagger
